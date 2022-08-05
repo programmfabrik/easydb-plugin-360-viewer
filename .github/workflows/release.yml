@@ -32,6 +32,9 @@ jobs:
       - name: Install coffeescript
         run: npm install -g coffeescript@${{ env.coffee_version}}
 
+      - name: Install dart sass
+        run: npm install -g sass
+
       - name: Extract tag version
         run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
         shell: bash
