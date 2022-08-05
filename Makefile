@@ -1,4 +1,5 @@
 PLUGIN_NAME = easydb-360-viewer-plugin
+ZIP_NAME ?= "${PLUGIN_NAME}.zip"
 
 EASYDB_LIB = easydb-library
 
@@ -30,11 +31,18 @@ ${JS}: $(subst .coffee,.coffee.js,${COFFEE_FILES}) ${LIB_FILES}
 	mkdir -p $(dir $@)
 	cat $^ > $@
 
-build: code $(L10N) buildinfojson
-
 code: $(JS) css
 
 clean: clean-base
+	rm -rf build/
 
 wipe: wipe-base
 
+build: clean code $(L10N) buildinfojson ## copy files to build folder
+	mkdir -p build/${PLUGIN_NAME}
+	cp -r l10n build/${PLUGIN_NAME}
+	cp -r build/webfrontend build/${PLUGIN_NAME}
+	cp -r manifest.yml build/${PLUGIN_NAME}/manifest.yml
+
+zip: build ## build zip file
+	cd build && zip ${ZIP_NAME} -r ${PLUGIN_NAME}/
