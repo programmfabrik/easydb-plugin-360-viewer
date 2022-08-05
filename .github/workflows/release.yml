@@ -48,10 +48,10 @@ jobs:
 
       - name: Generate manifest versioned file
         run: |
-          echo -e "plugin:\n  version: $VERSION" > manifest.version.yml
+          echo -e "plugin:\n  version: $(echo $VERSION | sed 's/^v//g')" > manifest.version.yml
 
       - name: Merge manifest.yml with manifest.version.yml
-        run: yq ea '. as $item ireduce ({}; . * $item )' manifest.yml manifest.version.yml
+        run: yq ea '. as $item ireduce ({}; . * $item )' manifest.yml manifest.version.yml --inplace
 
       - name: Build and Package
         shell: bash
