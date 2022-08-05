@@ -1,4 +1,4 @@
-PLUGIN_NAME = easydb-360-viewer-plugin
+PLUGIN_NAME = easydb-plugin-360-viewer
 ZIP_NAME ?= "${PLUGIN_NAME}.zip"
 
 EASYDB_LIB = easydb-library
@@ -18,7 +18,7 @@ INSTALL_FILES = \
 	manifest.yml
 
 COFFEE_FILES = src/webfrontend/Viewer360AssetDetailPlugin.coffee
-SCSS_FILES = src/webfrontend/scss/easydb-360-viewer-plugin.scss
+SCSS_FILES = src/webfrontend/scss/easydb-plugin-360-viewer.scss
 
 LIB_FILES = src/lib/three.min.js \
 	src/lib/panolens.min.js

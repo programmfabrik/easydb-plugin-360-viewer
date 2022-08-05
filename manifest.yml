@@ -1,10 +1,12 @@
 plugin:
-  name: easydb-360-viewer-plugin
-  version: 1.0
+  name: easydb-plugin-360-viewer
+  version: 1.0.0
+  l10n: l10n/easydb-plugin-360-viewer.csv
   webfrontend:
-    url: easydb-360-viewer-plugin.js
-    css: easydb-360-viewer-plugin.css
-    l10n: l10n/
+    url: easydb-plugin-360-viewer.js
+    css: easydb-plugin-360-viewer.css
   displayname:
     de-DE: 360 Viewer Plugin
     en-US: 360 Viewer Plugin
+
+base_url_prefix: "webfrontend"
