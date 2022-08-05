@@ -1,42 +1,54 @@
-name: release
+name: Release
 
 on:
   push:
     tags:
-      - v*
-      - v*.*
-      - v*.*.*
+      - "v*.*.*"
+
+env:
+  go_version: 1.19
+  yq_version: v4.27.2
 
 jobs:
-  container-fylr:
-    name: release the plugin
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/${{ env.yq_version }}/yq_linux_amd64 -O /usr/local/bin/yq
+          sudo chmod a+x /usr/local/bin/yq
+
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build project
-        run: zip ${{ github.event.repository.name }}.zip *
+      - name: Extract tag version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: RELEASES.md
-          draft: false
-          prerelease: true
+      - name: Extract repository name
+        run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set zip file env name
+        run: echo "ZIP_NAME=${{env.REPOSITORY_NAME}}.zip" >> $GITHUB_ENV
+
+      - name: Generate manifest versioned file
+        run: |
+          echo -e "plugin:\n  version: $VERSION" > manifest.version.yml
+
+      - name: Merge manifest.yml with manifest.version.yml
+        run: yq ea '. as $item ireduce ({}; . * $item )' manifest.yml manifest.version.yml
+
+      - name: Build and Package
+        shell: bash
+        run: make zip
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ github.event.repository.name }}.zip
-          asset_name: ${{ github.event.repository.name }}.zip
-          asset_content_type: application/zip
+          name: Release ${{ env.VERSION }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            build/${{ env.ZIP_NAME }}
+            README.md
