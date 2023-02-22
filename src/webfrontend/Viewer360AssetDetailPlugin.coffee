@@ -33,6 +33,9 @@ class Viewer360AssetDetailPlugin extends AssetDetail
 		if not asset
 			return
 		for value in asset.values or []
+			# PanoLens only work with images.
+			if value.class != "image"
+				continue
 			for _, _value of value.versions
 				if _value.height * 2 == _value.width
 					return _value
